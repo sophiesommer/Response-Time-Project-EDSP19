@@ -303,13 +303,30 @@ summary(fit_M1)
     ## Multiple R-squared:  0.1826, Adjusted R-squared:  0.1825 
     ## F-statistic:  1325 on 6 and 35586 DF,  p-value: < 2.2e-16
 
+``` r
+#run and anova comparing to baseline model
+anova(fit_base2, fit_M1)
+```
+
+    ## Analysis of Variance Table
+    ## 
+    ## Model 1: log(Att1_Time) ~ (RaschAbility + RaschAbilitySq) * RaschDiff
+    ## Model 2: log(Att1_Time) ~ (RaschAbility + RaschAbilitySq) * RaschDiff + 
+    ##     PropUsedOpp
+    ##   Res.Df   RSS Df Sum of Sq      F    Pr(>F)    
+    ## 1  35587 27432                                  
+    ## 2  35586 27414  1    18.124 23.526 1.237e-06 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
 PropUsedOpp is also a significant (at a .05 level) positive predictor of
 response time, suggesting that students who take more advantage of
 additional attempts also tend to take longer on their first attempt.
 Adjusted R squared increased, but only by about 0.0006, so it’s not
 totally clear whether the addition of PropUsedOpp accounts for enough
 additional variance in log response time to justify the more complex
-model.
+model (note: the F test above is statistically significant at a .05
+level, suggesting that the addition of PropUsedOpp is warranted).
 
 Other explorations
 ==================

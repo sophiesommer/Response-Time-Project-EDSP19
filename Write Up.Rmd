@@ -129,9 +129,12 @@ After running these baseline models, I then added my measure of student resilien
 #first alternate model
 fit_M1 <- lm(log(Att1_Time)~(RaschAbility+RaschAbilitySq)*RaschDiff+PropUsedOpp, data=finaldata)
 summary(fit_M1)
+
+#run and anova comparing to baseline model
+anova(fit_base2, fit_M1)
 ```
     
-PropUsedOpp is also a significant (at a .05 level) positive predictor of response time, suggesting that students who take more advantage of additional attempts also tend to take longer on their first attempt. Adjusted R squared increased, but only by about 0.0006, so it's not totally clear whether the addition of PropUsedOpp accounts for enough additional variance in log response time to justify the more complex model.   
+PropUsedOpp is also a significant (at a .05 level) positive predictor of response time, suggesting that students who take more advantage of additional attempts also tend to take longer on their first attempt. Adjusted R squared increased, but only by about 0.0006, so it's not totally clear whether the addition of PropUsedOpp accounts for enough additional variance in log response time to justify the more complex model (note: the F test above is statistically significant at a .05 level, suggesting that the addition of PropUsedOpp is warranted).   
     
 # Other explorations  
 My initial interest when I first began this project was in understanding whether I could measure student resilience by looking at student response patterns. My hypothesis was that I could identify students who had given up by looking for quick, repeated responses. In this initial pursuit, I noted the following:  
