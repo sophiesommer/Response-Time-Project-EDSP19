@@ -20,9 +20,9 @@ Atts1to4 <- function(coursename, datadir, out_path){
   scores$correct[scores$correct=="true"] <- 1
   scores$correct[scores$correct=="false"] <- 0
   
-  #this was due to missing data in Anatomy 1
-  errs <- which(steps$first_visited_at=="")
-  steps <- steps[-errs,]
+  #this was to deal with missing data in Anatomy 1
+  # errs <- which(steps$first_visited_at=="")
+  # steps <- steps[-errs,]
   
   #convert dates/times to POSIXct format (so they can be ordered)
   scores$submitted_at <- as.POSIXct(scores$submitted_at)
