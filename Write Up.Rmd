@@ -108,12 +108,18 @@ ggplot(data.frame(Score=learnersumm$RaschAbility, LogTime = learnersumm$MeanLogT
 ```
    
 # Final Modeling
-Because I found that there appeared to be some quadratic relationship between time on first attempt and ability level, my initial model included a squared term for ability (as measured by the Rasch model). I also included an interaction term between ability and difficulty, because I hypothesized that the impact of question difficulty on response times would be different depending on student ability levels. Therefore, my first baseline model was as follows:  
+Because I found that there appeared to be some quadratic relationship between time on first attempt and ability level, my initial model included a squared term for ability (as measured by the Rasch model). I also included an interaction term between ability and difficulty, because I hypothesized that the impact of question difficulty on response times would be different depending on student ability levels. Therefore, my first baseline model was as follows (note: I also ran the model on a dataset with missing data for PropUsedOpp removed so that the R squared value could be compared to the R squared in my next model):  
   
 ```{r}
 finaldata$RaschAbilitySq <- finaldata$RaschAbility^2
 fit_base <- lm(log(Att1_Time)~(RaschAbility+RaschAbilitySq)*RaschDiff, data=finaldata)
 summary(fit_base)
+
+#subsetting to only include non-missing data
+finaldata2 <- finaldata[!is.na(finaldata$PropUsedOpp),]
+#re-run same model without missing data:  
+fit_base2 <- lm(log(Att1_Time)~(RaschAbility+RaschAbilitySq)*RaschDiff, data=finaldata2)
+summary(fit_base2)
 ```
   
 Note that all of the predictors are significant at a .05 significance level. As expected, higher difficulty questions tend to have slower response times. Also as expected, the coefficient on RaschAbility (which measures student ability) is positive, but the coefficient on RaschAbility^2 is negative, indicating that higher ability levels are associated with longer response times to a point, at which point higher abilities are associated with faster response times. All of the interaction terms are also significant, suggesting that the relationship between question difficulty and response time is different depending on student ability levels. Overall, these factors are accounting for just over 18% of the variation in log first attempts times. Therefore, these factors explain some of the variation in response time, but there is still a lot of extra noise.    
@@ -125,7 +131,7 @@ fit_M1 <- lm(log(Att1_Time)~(RaschAbility+RaschAbilitySq)*RaschDiff+PropUsedOpp,
 summary(fit_M1)
 ```
     
-PropUsedOpp is also a significant (at a .05 level) positive predictor of response time, suggesting that students who take more advantage of additional attempts also tend to take longer on their first attempt. Unfortunately, because this model was run with less data (removing all people who had no opportunities to make additional attempts), the R squared values are not directly comparable.    
+PropUsedOpp is also a significant (at a .05 level) positive predictor of response time, suggesting that students who take more advantage of additional attempts also tend to take longer on their first attempt. Adjusted R squared increased, but only by about 0.0006, so it's not totally clear whether the addition of PropUsedOpp accounts for enough additional variance in log response time to justify the more complex model.   
     
 # Other explorations  
 My initial interest when I first began this project was in understanding whether I could measure student resilience by looking at student response patterns. My hypothesis was that I could identify students who had given up by looking for quick, repeated responses. In this initial pursuit, I noted the following:  

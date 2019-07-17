@@ -188,7 +188,9 @@ included a squared term for ability (as measured by the Rasch model). I
 also included an interaction term between ability and difficulty,
 because I hypothesized that the impact of question difficulty on
 response times would be different depending on student ability levels.
-Therefore, my first baseline model was as follows:
+Therefore, my first baseline model was as follows (note: I also ran the
+model on a dataset with missing data for PropUsedOpp removed so that the
+R squared value could be compared to the R squared in my next model):
 
 ``` r
 finaldata$RaschAbilitySq <- finaldata$RaschAbility^2
@@ -219,6 +221,38 @@ summary(fit_base)
     ## Residual standard error: 0.8748 on 36855 degrees of freedom
     ## Multiple R-squared:  0.1852, Adjusted R-squared:  0.1851 
     ## F-statistic:  1675 on 5 and 36855 DF,  p-value: < 2.2e-16
+
+``` r
+#subsetting to only include non-missing data
+finaldata2 <- finaldata[!is.na(finaldata$PropUsedOpp),]
+#re-run same model without missing data:  
+fit_base2 <- lm(log(Att1_Time)~(RaschAbility+RaschAbilitySq)*RaschDiff, data=finaldata2)
+summary(fit_base2)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = log(Att1_Time) ~ (RaschAbility + RaschAbilitySq) * 
+    ##     RaschDiff, data = finaldata2)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.8956 -0.5748 -0.0801  0.4888  4.4274 
+    ## 
+    ## Coefficients:
+    ##                           Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)               3.650104   0.008313 439.100   <2e-16 ***
+    ## RaschAbility              0.300549   0.012506  24.032   <2e-16 ***
+    ## RaschAbilitySq           -0.096928   0.005516 -17.572   <2e-16 ***
+    ## RaschDiff                 0.354219   0.011234  31.532   <2e-16 ***
+    ## RaschAbility:RaschDiff    0.263256   0.017015  15.472   <2e-16 ***
+    ## RaschAbilitySq:RaschDiff -0.072547   0.007520  -9.647   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.878 on 35587 degrees of freedom
+    ## Multiple R-squared:  0.1821, Adjusted R-squared:  0.1819 
+    ## F-statistic:  1584 on 5 and 35587 DF,  p-value: < 2.2e-16
 
 Note that all of the predictors are significant at a .05 significance
 level. As expected, higher difficulty questions tend to have slower
@@ -272,9 +306,10 @@ summary(fit_M1)
 PropUsedOpp is also a significant (at a .05 level) positive predictor of
 response time, suggesting that students who take more advantage of
 additional attempts also tend to take longer on their first attempt.
-Unfortunately, because this model was run with less data (removing all
-people who had no opportunities to make additional attempts), the R
-squared values are not directly comparable.
+Adjusted R squared increased, but only by about 0.0006, so it’s not
+totally clear whether the addition of PropUsedOpp accounts for enough
+additional variance in log response time to justify the more complex
+model.
 
 Other explorations
 ==================
