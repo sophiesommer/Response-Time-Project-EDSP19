@@ -1,1 +1,5 @@
-# EDSP-Response-Time-Project
+# Modeling Student Response Times as a Function of Question Difficulty, Student Ability, and Student Resiliency  
+
+The work in this repository is primarily from a project completed for the 2019 Educational Data Science Practicum at NYU Steinhardt (part of the Applied Statistics for Social Science Research MS program). The goal of the project was to model response times to online quiz questions as a function of question difficulty, student ability, and other student-level predictors. The initial project involved data from a massive open online course called Money in Business (run 1). I presented this project at the 2019 Subway Summit at NYU, and the slides from that presentation are also included here under 'presentations'.   
+  
+I later completed a follow-up analysis with a new cohort of students (run 2 of the course) as part of a Bayesian Inference course, also taken as part of the Applied Statistics program at NYU. A summary PDF of this work is provided in the folder 'later analyses'.   
