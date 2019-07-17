@@ -87,19 +87,35 @@ attmat$numattd <- rowSums(!is.na(attmat[,1:length(questions)]))
 
 #Estimate student ability using the attempts matrix and save this information in both the
 #attempts matrix and question summary
-fit2 <- ltm::rasch(attmat[,1:length(questions)])
-scores <- factor.scores(fit2, resp.patterns = attmat[,1:length(questions)])
-scores <- scores$score.dat$z1
-attmat$scoreRasch <- scores
+rstan_options(auto_write = TRUE)
+options(mc.cores = parallel::detectCores())
+list <- irt_data(response_matrix = attmat[,1:30])
+
+#fit the model
+fit_rasch <- irt_stan(list, 
+                      model = "rasch_latent_reg.stan",
+                      refresh = 0,
+                      iter = 300, 
+                      chains = 4)
+#obtain mean beta and theta estimates
+res <- as.data.frame(fit_rasch)
+betas <- colMeans(res)[2419:2448]
+thetas <- colMeans(res)[30:2416]
+estdiff <- data.frame(Question=as.numeric(substring(colnames(attmat[,1:30]),2)),
+                      RaschDiff = betas)
+learners <- rownames(attmat)
+estability <- data.frame(Learner=learners,
+                         RaschAbility = thetas)
+
 attmat$scoreRaw <- rowMeans(attmat[,1:length(questions)],na.rm=T)
-difficulties <- fit2$coefficients[,1]
-questionsumm$difficultyQ <- difficulties
+attmat$Learner <- row.names(attmat)
+attmat <- dplyr::left_join(attmat,estability, by="Learner")
+questionsumm <- dplyr::left_join(questionsumm,estdiff, by="Question")
 
 #Save question summary
 write.csv(questionsumm, paste0(out_path,coursename,"QuestionSumm.csv"))
 
 #Merge all this new information from the attempts matrix with the attempt times and save as attmat2
-attmat$Learner <- rownames(attmat)
 attmat2 <- dplyr::left_join(AllAtts, attmat, by = "Learner")
 attmat2 <- attmat2[,-c(9:(9+length(questions)-1))]
 attmat2 <- dplyr::left_join(attmat2, giveups, by = "Learner")
@@ -109,11 +125,11 @@ attmat2 <- dplyr::left_join(attmat2, questionsumm, by = "Question")
 learners <- unique(fullatt$Learner)
 learnersumm <- data.frame(Learner=learners,
                           PropAttempted=rep(NA,length(learners)),
-                          ScoreRasch=rep(NA,length(learners)),
                           PropCorrect1st=rep(NA,length(learners)),
                           MeanLogTotalTime=rep(NA,length(learners)),
                           MeanLogTimeAtt1=rep(NA,length(learners)))
 
+learnersumm <- dplyr::left_join(learnersumm,estability, by="Learner")
 
 #Fill in learner summary
 for(learner in learners){
@@ -121,7 +137,6 @@ for(learner in learners){
   if(nrow(qatt)>0){
     learnersumm$PropAttempted[learnersumm$Learner==learner] <- qatt$numattd[1]/30
     learnersumm$PropCorrect1st[learnersumm$Learner==learner] <- qatt$scoreRaw[1]
-    learnersumm$ScoreRasch[learnersumm$Learner==learner] <- qatt$scoreRasch[1]
     Att1 <- na.omit(qatt$Att1_Time)
     Att1 <- Att1[Att1 <=1000]
     AttTotal <- na.omit(qatt$TotalTime)
@@ -137,9 +152,6 @@ write.csv(learnersumm, paste0(out_path,coursename,"LearnerSumm.csv"))
 
 #Resave attmat2 as attmat3, which eliminates responses that are greater than 2400 seconds
 attmat3 <- attmat2[attmat2$TotalTime<2400,]
-
-#Create a score^2 variable
-attmat3$scoreRaschSq <- attmat3$scoreRasch * attmat3$scoreRasch
 
 #Save full dataset
 write.csv(attmat3, paste0(out_path,coursename,"FinalData.csv"))
