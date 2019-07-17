@@ -1,0 +1,14 @@
+base
+ggplot2
+StanHeaders
+rstan
+edstan
+Rcpp
+rstanarm
+lattice
+mirt
+MASS
+msm
+polycor
+ltm
+dplyr
